@@ -6,7 +6,7 @@ from MainWindow import Ui_MainWindow
 
 import serial.tools.list_ports
 from datetime import datetime
-
+import csv
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
@@ -89,21 +89,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lastData = data
 
     def startReport(self):
-        self.recordReport = True
-        self.actionNew.setEnabled(False)
-        self.actionSave.setEnabled(True)
-        self.lastData = [0, 0, 0, 0, 0, datetime.now()]
-        try:
-            inBuffer = serial.Serial(self.deviceName, self.devicePort)
-            while self.recordReport:
-                QtCore.QCoreApplication.processEvents()
-                if inBuffer.in_waiting != 0:
-                    data = inBuffer.readline().decode('utf-8').strip('\r\n').split(';')
-                    formated_data = [int(float(i)) for i in data[1:]]
-                    formated_data.append(datetime.now())
-                    self.displayData(formated_data)
-        except ValueError as error:
-            print(error)
+        filename = QFileDialog.getSaveFileName(self, 'Save File')
+        if filename[0] == '':
+            pass
+        else:
+            self.recordReport = True
+            self.actionNew.setEnabled(False)
+            self.actionSave.setEnabled(True)
+            self.lastData = [0, 0, 0, 0, 0, datetime.now()]
+            print(filename)
+            with open(filename[0]+'.csv', mode='w') as csvfile:
+                print(csvfile)
+                vehicle_data = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                vehicle_data.writerow(['RPM', 'Speed', 'Distance', 'Battery', 'Gasoline1', 'Gasoline2', 'Date(DD/MM/YY - HH:MM:SS'])
+
+                try:
+                    inBuffer = serial.Serial(self.deviceName, self.devicePort)
+                    while self.recordReport:
+                        QtCore.QCoreApplication.processEvents()
+                        if inBuffer.in_waiting != 0:
+                            data = inBuffer.readline().decode('utf-8').strip('\r\n').split(';')
+                            formated_data = [int(float(i)) for i in data[1:]]
+                            formated_data.append(datetime.now())
+                            self.displayData(formated_data)
+                            date = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+                            vehicle_data.writerow([formated_data[0], formated_data[1], round(self.distanceAcc,3), formated_data[2], formated_data[3], formated_data[4], date])
+                except ValueError as error:
+                    print(error)
         
     def calculateDistance(self, newData):
         deltaTime = (newData[5] - self.lastData[5]).seconds/3600
