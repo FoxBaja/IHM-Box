@@ -47,7 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def cleanConsole(self):
         self.console.clear()
-    
+
     def saveReport(self):
         self.recordReport = False
         self.actionSave.setEnabled(False)
@@ -56,7 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menuConnect.setEnabled(True)
 
     def displayData(self, data):
-        rpm, speed, battery, gas_1, gas_2, timestamp = data
+        speed, battery, rpm, gasoline, timestamp = data
 
         self.rpmAcc += rpm
         self.dataCounter += 1
@@ -72,11 +72,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lcd_rpm_max.setProperty("value", rpm)
             self.rpmMax = rpm
 
-        if not gas_2:
-            self.progress_gasoline.setProperty("value", 66)
-        if not gas_1:
-            self.progress_gasoline.setProperty("value", 33)
-
         distance = self.calculateDistance(data)
 
         self.lcd_rpm_value.setProperty("value", rpm)
@@ -84,6 +79,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lcd_rpm_mean.setProperty("value", rpm_mean)
         self.lcd_speed_mean.setProperty("value", speed_mean)
         self.progress_battery.setProperty("value", battery)
+        self.progress_gasoline.setProperty("value", gasoline)
         self.lcd_distance.setProperty("value", self.distanceAcc)
 
         self.lastData = data
@@ -96,30 +92,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.recordReport = True
             self.actionNew.setEnabled(False)
             self.actionSave.setEnabled(True)
-            self.lastData = [0, 0, 0, 0, 0, datetime.now()]
+            self.lastData = [0, 0, 0, 0, datetime.now()]
             print(filename)
             with open(filename[0]+'.csv', mode='w') as csvfile:
                 print(csvfile)
                 vehicle_data = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                vehicle_data.writerow(['RPM', 'Speed', 'Distance', 'Battery', 'Gasoline1', 'Gasoline2', 'Date(DD/MM/YY - HH:MM:SS'])
-
+                vehicle_data.writerow(['Speed', 'Battery', 'RPM', 'Gasoline', 'Distance', 'Date(DD/MM/YY - HH:MM:SS'])
                 try:
                     inBuffer = serial.Serial(self.deviceName, self.devicePort)
                     while self.recordReport:
                         QtCore.QCoreApplication.processEvents()
                         if inBuffer.in_waiting != 0:
                             data = inBuffer.readline().decode('utf-8').strip('\r\n').split(';')
-                            formated_data = [int(float(i)) for i in data[1:]]
+                            if len(data) != 4:
+                                pass
+                            formated_data = [int(float(i)) for i in data[:4]]
                             formated_data.append(datetime.now())
+                            print(formated_data)
                             self.displayData(formated_data)
+                            
                             date = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-                            vehicle_data.writerow([formated_data[0], formated_data[1], round(self.distanceAcc,3), formated_data[2], formated_data[3], formated_data[4], date])
-                except ValueError as error:
-                    print(error)
-        
+                            vehicle_data.writerow([formated_data[0], formated_data[1], formated_data[2], formated_data[3], round(self.distanceAcc,3), date])
+                except NameError:
+                    print(NameError)
+
     def calculateDistance(self, newData):
-        deltaTime = (newData[5] - self.lastData[5]).seconds/3600
-        deltaSpeed = (newData[1] + self.lastData[1])/2
+        deltaTime = (newData[4] - self.lastData[4]).seconds/3600
+        deltaSpeed = (newData[0] + self.lastData[0])/2
         distance = deltaSpeed * deltaTime
         self.distanceAcc += distance
         return distance
