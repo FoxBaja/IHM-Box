@@ -8,7 +8,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -25,8 +24,8 @@ class Ui_MainWindow(object):
         self.background.setGeometry(QtCore.QRect(0, -20, 1280, 800))
         self.background.setText("")
         self.background.setTextFormat(QtCore.Qt.PlainText)
-        self.background.setPixmap(QtGui.QPixmap("sketch/background.png"))
-        self.background.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.background.setPixmap(QtGui.QPixmap("sketch/background2.png"))
+        self.background.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.background.setObjectName("background")
         self.lcd_rpm_value = QtWidgets.QLCDNumber(self.centralwidget)
         self.lcd_rpm_value.setGeometry(QtCore.QRect(338, 154, 170, 80))
@@ -78,7 +77,7 @@ class Ui_MainWindow(object):
         self.progress_battery.setObjectName("progress_battery")
         self.progress_gasoline = QtWidgets.QProgressBar(self.centralwidget)
         self.progress_gasoline.setGeometry(QtCore.QRect(338, 683, 494, 80))
-        self.progress_gasoline.setProperty("value", 100)
+        self.progress_gasoline.setProperty("value", 0)
         self.progress_gasoline.setObjectName("progress_gasoline")
         self.console = QtWidgets.QListWidget(self.centralwidget)
         self.console.setGeometry(QtCore.QRect(853, 424, 410, 339))
@@ -88,10 +87,10 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.console.sizePolicy().hasHeightForWidth())
         self.console.setSizePolicy(sizePolicy)
         self.console.setStyleSheet("background-color: rgb(0, 0, 0);\n"
-                                    "selection-background-color: rgb(0, 0, 0);\n"
-                                    "selection-color: rgb(0, 0, 0);\n"
-                                    "font: 8pt \"Consolas\";\n"
-                                    "color: rgb(255, 0, 0);")
+"selection-background-color: rgb(0, 0, 0);\n"
+"selection-color: rgb(0, 0, 0);\n"
+"font: 8pt \"Consolas\";\n"
+"color: rgb(255, 0, 0);")
         self.console.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.console.setFrameShadow(QtWidgets.QFrame.Plain)
         self.console.setLineWidth(0)
@@ -131,15 +130,19 @@ class Ui_MainWindow(object):
         self.menuHelp = QtWidgets.QMenu(self.menuBar)
         self.menuHelp.setObjectName("menuHelp")
         MainWindow.setMenuBar(self.menuBar)
-        self.actionSave = QtWidgets.QAction(MainWindow)
-        self.actionSave.setEnabled(False)
-        self.actionSave.setObjectName("actionSave")
-        self.actionNew = QtWidgets.QAction(MainWindow)
-        self.actionNew.setEnabled(False)
-        self.actionNew.setObjectName("actionNew")
+        self.actionStart = QtWidgets.QAction(MainWindow)
+        self.actionStart.setEnabled(False)
+        self.actionStart.setObjectName("actionStart")
+        self.actionStop = QtWidgets.QAction(MainWindow)
+        self.actionStop.setEnabled(False)
+        self.actionStop.setObjectName("actionStop")
+        self.actionDisconnect = QtWidgets.QAction(MainWindow)
+        self.actionDisconnect.setEnabled(False)
+        self.actionDisconnect.setObjectName("actionDisconnect")
         self.menuFile.addAction(self.menuConnect.menuAction())
-        self.menuFile.addAction(self.actionNew)
-        self.menuFile.addAction(self.actionSave)
+        self.menuFile.addAction(self.actionStart)
+        self.menuFile.addAction(self.actionStop)
+        self.menuFile.addAction(self.actionDisconnect)
         self.menuBar.addAction(self.menuFile.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
 
@@ -149,10 +152,12 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fox Baja IHM"))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.menuConnect.setTitle(_translate("MainWindow", "Connect"))
-        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
-        self.actionSave.setText(_translate("MainWindow", "Save as"))
-        self.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
-        self.actionNew.setText(_translate("MainWindow", "New report"))
-        self.actionNew.setShortcut(_translate("MainWindow", "Ctrl+N"))
+        self.menuFile.setTitle(_translate("MainWindow", "Arquivo"))
+        self.menuConnect.setTitle(_translate("MainWindow", "Conectar"))
+        self.menuHelp.setTitle(_translate("MainWindow", "Ajuda"))
+        self.actionStart.setText(_translate("MainWindow", "Iniciar"))
+        self.actionStart.setShortcut(_translate("MainWindow", "Ctrl+N"))
+        self.actionStop.setText(_translate("MainWindow", "Parar"))
+        self.actionStop.setShortcut(_translate("MainWindow", "Ctrl+Q"))
+        self.actionDisconnect.setText(_translate("MainWindow", "Desconectar"))
+
