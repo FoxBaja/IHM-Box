@@ -1,14 +1,5 @@
 # IHM Box Fox Baja
 
-## Índice
-- [Sobre](#sobre)
-- [Instalação](#instalação)
-- [Uso](#uso)
-- [Como foi feito](#como-foi-feito)
-- [Como funciona](#como-funciona)
-- [Maintainers](#maintainers)
-- [License](#license)
-
 ## Sobre
 O programa consiste na recepção de dados provenientes do carro Fox Baja via rádio frequência LoRa, sendo ingeridos no computador via porta serial. Os dados são mostrados para a equipe em tempo real, fornecendo uma média, valor máximo e a distância que o carro percorreu. Todos esses dados podem ser salvos em um arquivo *.csv* para futura análise.
 
