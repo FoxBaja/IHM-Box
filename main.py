@@ -129,6 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lcd_rpm_max.setProperty("value", rpm)
             self.rpmMax = rpm
 
+        #Só é chamada, pois o valor é armazenado em um atributo
         self.calculateDistance(data)
 
         self.lcd_rpm_value.setProperty("value", rpm)
@@ -139,6 +140,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progress_gasoline.setProperty("value", gasoline)
         self.lcd_distance.setProperty("value", self.distanceAcc)
 
+        #Atualiza o atributo último dado
         self.lastData = data
 
     def cleanDisplayData(self):
@@ -160,8 +162,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if inBuffer.in_waiting != 0:
                 data = inBuffer.readline().decode('utf-8').strip('\r\n').split(';')
                 if len(data) == 6 and data[0] == "Fox":
+                    #Transforma os elementos da lista de string para int. (é preciso transformar para float primeiro)
                     formated_data = [int(float(i)) for i in data[1:5]]
                     formated_data.append(datetime.now())
+                    # Flag de gravar no arquivo
                     if self.recordReport:
                         date = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
                         self.writeReport(formated_data, date)
@@ -176,6 +180,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.resetGlobalVars()
         self.cleanDisplayData()
         self.filename = QFileDialog.getSaveFileName(self, 'Save File')
+        # Se o usuário der cancel na janela de Salvar, o programa retorna vazio.
         if self.filename[0] == '':
             self.consolePrint("Operação cancelada, tente novamente")
             pass
@@ -185,9 +190,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             with open(self.filename[0]+'.csv', mode='w') as csvfile:
                 vehicle_data = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 vehicle_data.writerow(['Speed', 'Battery', 'RPM', 'Gasoline', 'Distance', 'Date(DD/MM/YY - HH:MM:SS)'])
+                # Muda a flag de Gravar dados no recebimento
                 self.recordReport = True
 
     def writeReport(self, data, date):
+        # Modo de escrita no arquivo é A, que significa que os dados serão escritos após os últimos dados (sem sobre escrita)
         with open(self.filename[0]+'.csv', mode='a') as csvfile:
             vehicle_data = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             vehicle_data.writerow([data[0], data[1], data[2], data[3], round(self.distanceAcc,3), date])
